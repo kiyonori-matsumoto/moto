@@ -1956,6 +1956,25 @@ def test_condition_expressions():
             },
         )
 
+    with assert_raises(client.exceptions.ConditionalCheckFailedException):
+        client.update_item(
+            TableName='test1',
+            Key={
+                'client': { 'S': 'client10'},
+                'app': { 'S': 'app1'},
+            },
+            UpdateExpression='set #match=:match',
+            ConditionExpression='(attribute_exists(#v0.#v1) AND #v0.#v1 <= :match)',
+            ExpressionAttributeValues={
+                ':match': {'S': 'match'}
+            },
+            ExpressionAttributeNames={
+                '#v0': 'existing',
+                '#v1': 'foo',
+                '#match': 'match',
+            },
+        )
+
 
 @mock_dynamodb2
 def test_condition_expression__attr_doesnt_exist():
